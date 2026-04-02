@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Level Resource Allocation for 5G Network Slicing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0b0f1a;
+      --surface:   #111827;
+      --border:    rgba(255,255,255,0.07);
+      --gold:      #c9a84c;
+      --gold-dim:  rgba(201,168,76,0.15);
+      --gold-glow: rgba(201,168,76,0.35);
+      --text:      #e8e2d6;
+      --muted:     #8a8579;
+      --accent:    #4f9cf9;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.75;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── BACKGROUND GRID ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: blur(18px) saturate(1.4);
+      background: rgba(11,15,26,0.85);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 120px 5vw 80px;
+      text-align: center;
+    }
+
+    /* radial glow behind hero */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -55%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      border: 1px solid var(--gold-dim);
+      background: var(--gold-dim);
+      color: var(--gold);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 1rem;
+      border-radius: 2px;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.8s both;
+    }
+
+    .hero-badge span { opacity: 0.7; }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 300;
+      line-height: 1.18;
+      max-width: 900px;
+      letter-spacing: -0.01em;
+      color: #f5f0e8;
+      animation: fadeUp 0.8s 0.15s both;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-meta {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin-top: 2.8rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      animation: fadeUp 0.8s 0.3s both;
+    }
+
+    .hero-meta .divider { opacity: 0.3; }
+
+    .hero-meta strong { color: var(--text); font-weight: 400; }
+
+    .hero-cta {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 3rem;
+      animation: fadeUp 0.8s 0.45s both;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.6rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: #0b0f1a;
+      border: 1px solid var(--gold);
+    }
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--gold);
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold);
+    }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+      animation: fadeUp 1s 0.8s both;
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      position: relative; z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 5vw 100px;
+    }
+
+    /* ── SECTION ── */
+    .section {
+      margin-bottom: 5rem;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .section.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .section-label {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .section-label .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--gold);
+      opacity: 0.7;
+    }
+
+    .section-label .line {
+      flex: 1; max-width: 40px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.35;
+    }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 400;
+      color: #f5f0e8;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+
+    h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--gold);
+      margin-bottom: 0.7rem;
+      margin-top: 2rem;
+    }
+
+    p {
+      color: #b8b0a4;
+      font-size: 0.97rem;
+      line-height: 1.85;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── ABSTRACT CARD ── */
+    .abstract-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      padding: 2.2rem 2.5rem;
+      border-radius: 0 4px 4px 0;
+      position: relative;
+    }
+
+    .abstract-card::before {
+      content: '"';
+      position: absolute; top: -0.5rem; left: 2rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      line-height: 1;
+      color: var(--gold);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    /* ── METRIC CARDS ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1.4rem 1.2rem;
+      border-radius: 4px;
+      text-align: center;
+      transition: border-color 0.25s;
+    }
+    .metric:hover { border-color: var(--gold-dim); }
+
+    .metric-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--gold);
+      line-height: 1;
+      display: block;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    /* ── ARCHITECTURE DIAGRAM ── */
+    .arch-diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .arch-level {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.2rem;
+      border-radius: 3px;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .arch-level.l1 { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.25); }
+    .arch-level.l2 { background: rgba(79,156,249,0.08); border-color: rgba(79,156,249,0.18); }
+    .arch-level.l3 { background: rgba(134,239,172,0.08); border-color: rgba(134,239,172,0.18); }
+
+    .arch-level-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+
+    .l1 .arch-level-num { background: rgba(201,168,76,0.2); color: var(--gold); }
+    .l2 .arch-level-num { background: rgba(79,156,249,0.2); color: var(--accent); }
+    .l3 .arch-level-num { background: rgba(134,239,172,0.2); color: #86ef9c; }
+
+    .arch-level-text { font-size: 0.88rem; color: var(--text); }
+    .arch-level-sub { font-size: 0.78rem; color: var(--muted); }
+
+    .arch-arrow {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0.2rem 0;
+    }
+
+    /* ── TAG ROW ── */
+    .tag-row {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .tag {
+      font-size: 0.73rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--surface);
+    }
+    .tag.gold { border-color: rgba(201,168,76,0.3); color: var(--gold); background: var(--gold-dim); }
+    .tag.blue { border-color: rgba(79,156,249,0.3); color: var(--accent); background: rgba(79,156,249,0.1); }
+
+    /* ── REFERENCES ── */
+    ol.refs {
+      padding-left: 1.5rem;
+      counter-reset: ref;
+      list-style: none;
+    }
+
+    ol.refs li {
+      counter-increment: ref;
+      position: relative;
+      padding-left: 2.2rem;
+      margin-bottom: 1rem;
+      font-size: 0.88rem;
+      color: #9a9490;
+      line-height: 1.65;
+    }
+
+    ol.refs li::before {
+      content: counter(ref);
+      position: absolute; left: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--gold);
+      background: var(--gold-dim);
+      width: 1.4rem; height: 1.4rem;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 2px;
+      top: 0.15rem;
+    }
+
+    /* ── LINKS ── */
+    .link-row {
+      display: flex; flex-direction: column; gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .link-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.88rem;
+      transition: border-color 0.25s, background 0.25s;
+    }
+    .link-item:hover { border-color: var(--gold-dim); background: rgba(201,168,76,0.05); }
+
+    .link-icon {
+      width: 32px; height: 32px;
+      background: var(--gold-dim);
+      border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .link-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    .link-arrow {
+      margin-left: auto;
+      color: var(--muted);
+      transition: color 0.2s, transform 0.2s;
+    }
+    .link-item:hover .link-arrow { color: var(--gold); transform: translateX(3px); }
+
+    /* ── FILE CARDS ── */
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .file-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.4rem 1.2rem;
+      text-decoration: none;
+      color: var(--text);
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: 0.7rem;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+    .file-card:hover { border-color: var(--gold-dim); transform: translateY(-3px); }
+
+    .file-card-icon {
+      width: 44px; height: 44px;
+      background: var(--gold-dim);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .file-card-name { font-size: 0.82rem; font-weight: 500; }
+    .file-card-type { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 5vw;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+
+    footer p { font-size: 0.8rem; color: var(--muted); margin: 0; }
+    footer .pnu { color: var(--gold); font-weight: 400; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.5; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.15); }
+    }
+
+    /* ── DIVIDER ── */
+    hr.section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 5rem 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero-meta { flex-direction: column; gap: 0.4rem; }
+      .hero-meta .divider { display: none; }
+      .abstract-card { padding: 1.5rem; }
+    }
+
+    /* ── HIGHLIGHT INLINE ── */
+    mark {
+      background: var(--gold-dim);
+      color: var(--gold);
+      padding: 0 0.2em;
+      border-radius: 2px;
+      font-weight: inherit;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82em;
+      color: var(--gold);
+      background: var(--gold-dim);
+      padding: 0.1em 0.35em;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#top">PNU · Master's Thesis</a>
+  <ul class="nav-links">
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#methodology">Methodology</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#references">References</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-badge">
+    <span>Pusan National University</span>
+    &nbsp;·&nbsp;
+    <span>Master's Thesis &nbsp;2026</span>
+  </div>
+
+  <h1>
+    Multi-Level Resource Allocation for <em>5G Network Slicing</em>:<br/>
+    From Slice-Level Spectrum &amp; Power Control<br/>to User-Level NOMA Scheduling
+  </h1>
+
+  <div class="hero-meta">
+    <strong>Eya Arouri</strong>
+    <span class="divider">|</span>
+    <span>Advisor: Prof. Yoo Young Hwan</span>
+    <span class="divider">|</span>
+    <span>Department of Computer Science and Engineering</span>
+  </div>
+
+  <div class="hero-cta">
+    <a href="#abstract" class="btn btn-primary">Read Abstract</a>
+    <a href="#files" class="btn btn-ghost">Download Thesis</a>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main>
+
+  <!-- TAG ROW -->
+  <div class="tag-row section" id="abstract">
+    <span class="tag gold">5G Network Slicing</span>
+    <span class="tag gold">Joint RB &amp; Power Allocation</span>
+    <span class="tag blue">NOMA</span>
+    <span class="tag blue">Reinforcement Learning</span>
+    <span class="tag">SLA Management</span>
+    <span class="tag">RAN Slicing</span>
+  </div>
+
+  <!-- ABSTRACT -->
+  <div class="section">
+    <div class="section-label">
+      <span class="num">01</span>
+      <span class="line"></span>
+      <h2>Abstract</h2>
+    </div>
+    <div class="abstract-card">
+      <p>
+        Network slicing enables multiple services to share a common 5G radio access network (RAN)
+        infrastructure while maintaining individual service level agreements (SLAs), yet most existing
+        resource allocation approaches operate on a single resource dimension — typically physical
+        resource blocks (PRBs) — and assume fixed or uniform power distribution across slices.
+      </p>
+      <p>
+        This thesis investigates a <mark>joint RB and power allocation framework</mark> for RAN slicing
+        based on <mark>Kernel-Based Reinforcement Learning (KBRL)</mark>, extending the original
+        one-dimensional model-based approach to a <mark>two-dimensional action space</mark> where both
+        spectrum and transmit power are simultaneously allocated to each slice.
+      </p>
+      <p>
+        The study was conducted on a simulated scenario comprising <code>5 eMBB slices</code> sharing
+        <code>200 PRBs</code> and <code>150 W</code> of base station transmit power, evaluated over
+        40,000 decision steps across two accuracy configurations (<code>[0.97, 0.99]</code> and
+        <code>[0.99, 0.999]</code>). A <strong>dual security factor mechanism</strong> was developed
+        to independently learn safety margins along both resource dimensions, combined with an
+        <strong>L-shape augmentation strategy</strong> that exploits power monotonicity to accelerate
+        online classifier training in the expanded action space.
+      </p>
+      <p>
+        Performance was compared against the original one-dimensional KBRL baseline using SLA
+        satisfaction rate, resource efficiency, and overflow adjustment frequency. Across
+        configurations, per-slice SLA satisfaction reached approximately <mark>82%</mark>, with an
+        overall positive SLA score of <mark>+0.585</mark> for the <code>[0.97, 0.99]</code> setting,
+        while average power consumption remained at <mark>139 W</mark> out of the 150 W budget.
+      </p>
+      <p>
+        Although the proposed two-dimensional approach did not match the SLA performance of the
+        one-dimensional baseline (which achieves above 90% satisfaction), it demonstrated the
+        <strong>feasibility of joint allocation</strong> and revealed key challenges specific to the
+        multi-resource setting: security factor inflation, chronic overflow adjustment caused by margin
+        accumulation across slices, and increased classifier complexity in the two-dimensional decision
+        boundary. The overflow adjustment rate of ~90% indicated that the proportional scaling
+        mechanism carried a substantial share of allocation decisions — suggesting that alternative
+        action space decomposition strategies such as hierarchical or multi-agent formulations may be
+        necessary to fully exploit the two-dimensional formulation.
+      </p>
+      <p>
+        This work constitutes the <strong>first level</strong> of a two-level resource management
+        architecture, where the second level will address intra-slice user scheduling through
+        NOMA-assisted reinforcement learning to further improve spectral and power efficiency.
+      </p>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- MOTIVATION -->
+  <div class="section" id="methodology">
+    <div class="section-label">
+      <span class="num">02</span>
+      <span class="line"></span>
+      <h2>Methodology</h2>
+    </div>
+
+  
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- METHODS -->
+  <div class="section" id="results">
+    <div class="section-label">
+      <span class="num">03</span>
+      <span class="line"></span>
+      <h2>Performance &amp; Results</h2>
+    </div>
+
+    
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- RESULTS -->
+  <div class="section" id="references">
+    <div class="section-label">
+      <span class="num">04</span>
+      <span class="line"></span>
+      <h2>References</h2>
+    </div>
+
+   
+  </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <strong>Eya Arouri</strong> · <span class="pnu">Pusan National University</span></p>
+  <p>Department of Computer Science and Engineering · Master's Thesis</p>
+</footer>
+
+<script>
+  // Intersection observer for scroll animations
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+    { threshold: 0.08 }
+  );
+  document.querySelectorAll('.section').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
