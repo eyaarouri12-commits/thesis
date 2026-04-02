@@ -610,49 +610,9 @@
     </div>
     <div class="abstract-card">
       <p>
-        Network slicing enables multiple services to share a common 5G radio access network (RAN)
-        infrastructure while maintaining individual service level agreements (SLAs), yet most existing
-        resource allocation approaches operate on a single resource dimension — typically physical
-        resource blocks (PRBs) — and assume fixed or uniform power distribution across slices.
+       Network slicing enables multiple services to share a common 5G radio access network (RAN) while maintaining individual service level agreements (SLAs). However, most existing slice-level resource allocation approaches operate on a single resource dimension, typically physical resource blocks (PRBs), and assume fixed or uniform power distribution — an assumption that limits both spectral and energy efficiency as the number of coexisting slices and traffic variability increase. To address this limitation, this thesis proposes a two-level resource management framework that jointly considers spectrum and power allocation under coupled budget constraints. At the first level, we use a model-based reinforcement learning approach to extend the original one-dimensional allocation method into a two-dimensional action space. In this formulation, an online classifier is trained to capture how traffic conditions and resource decisions relate to SLA outcomes, allowing the agent to identify the minimum amount of PRBs and transmit power required for each slice. The second level focuses on scheduling users within each slice, where a NOMA-assisted reinforcement learning mechanism groups users that share the same resource blocks in order to push spectral and power efficiency further. We evaluate the proposed framework under multiple scenarios that differ in the number of active slices, the traffic profiles they carry, and the base station power budget. Our results show that performing joint spectrum and power allocation within a model-based RL setting is feasible, with the agent achieving positive SLA satisfaction across the tested configurations. At the same time, the experiments bring to light a number of challenges that are unique to the multi-resource case, notably the tendency of safety margins to grow over time and the greater difficulty of learning accurate decision boundaries in a higher-dimensional action space, both of which behave quite differently from what is observed in the single-resource baseline. These observations point toward promising directions for future work, including decomposing the action space hierarchically and exploring multi-agent architectures. Taken together, this thesis puts forward a multi-level allocation framework for 5G network slicing that aims to maintain SLA guarantees while making efficient use of both spectrum and power resources at the slice and user levels.
       </p>
-      <p>
-        This thesis investigates a <mark>joint RB and power allocation framework</mark> for RAN slicing
-        based on <mark>Kernel-Based Reinforcement Learning (KBRL)</mark>, extending the original
-        one-dimensional model-based approach to a <mark>two-dimensional action space</mark> where both
-        spectrum and transmit power are simultaneously allocated to each slice.
-      </p>
-      <p>
-        The study was conducted on a simulated scenario comprising <code>5 eMBB slices</code> sharing
-        <code>200 PRBs</code> and <code>150 W</code> of base station transmit power, evaluated over
-        40,000 decision steps across two accuracy configurations (<code>[0.97, 0.99]</code> and
-        <code>[0.99, 0.999]</code>). A <strong>dual security factor mechanism</strong> was developed
-        to independently learn safety margins along both resource dimensions, combined with an
-        <strong>L-shape augmentation strategy</strong> that exploits power monotonicity to accelerate
-        online classifier training in the expanded action space.
-      </p>
-      <p>
-        Performance was compared against the original one-dimensional KBRL baseline using SLA
-        satisfaction rate, resource efficiency, and overflow adjustment frequency. Across
-        configurations, per-slice SLA satisfaction reached approximately <mark>82%</mark>, with an
-        overall positive SLA score of <mark>+0.585</mark> for the <code>[0.97, 0.99]</code> setting,
-        while average power consumption remained at <mark>139 W</mark> out of the 150 W budget.
-      </p>
-      <p>
-        Although the proposed two-dimensional approach did not match the SLA performance of the
-        one-dimensional baseline (which achieves above 90% satisfaction), it demonstrated the
-        <strong>feasibility of joint allocation</strong> and revealed key challenges specific to the
-        multi-resource setting: security factor inflation, chronic overflow adjustment caused by margin
-        accumulation across slices, and increased classifier complexity in the two-dimensional decision
-        boundary. The overflow adjustment rate of ~90% indicated that the proportional scaling
-        mechanism carried a substantial share of allocation decisions — suggesting that alternative
-        action space decomposition strategies such as hierarchical or multi-agent formulations may be
-        necessary to fully exploit the two-dimensional formulation.
-      </p>
-      <p>
-        This work constitutes the <strong>first level</strong> of a two-level resource management
-        architecture, where the second level will address intra-slice user scheduling through
-        NOMA-assisted reinforcement learning to further improve spectral and power efficiency.
-      </p>
+      
     </div>
   </div>
 
