@@ -833,9 +833,7 @@ workloads while still maintaining the SLA requirements of each slice.
     </div>
 
     <p>
-      Across all three scenarios the joint (PRB, power) controller meets the same SLA targets as the
-      1D baseline while using substantially less transmit power and slightly fewer PRBs at identical
-      workloads:
+      Across all three scenarios the joint (PRB, power) controller delivers substantially lower transmit power and slightly fewer PRBs at identical workloads. On SLA violations the picture is scenario-dependent: in Scenario 1 the 2D + NOMA controller has fewer violations than the 1D baseline (a 31–36% reduction), while in Scenarios 2 and 3 its raw violation count is higher — not because the controller is worse, but because the 2D simulator adds a physical mMTC channel model (per-repetition SNR, QPSK demodulation threshold, and SIC-failure cascade) that the 1D simulator never modelled. That added realism counts decoding failures and retransmissions the 1D baseline silently treated as successful, as detailed in the trade-off note below.
     </p>
 
     <div class="table-wrap">
@@ -843,8 +841,8 @@ workloads while still maintaining the SLA requirements of each slice.
         <thead>
           <tr>
             <th>Scenario</th>
-            <th>1D KBRL — Power</th>
-            <th>2D + NOMA — Power</th>
+            <th>1D KBRL<br>Power · RB</th>
+            <th>2D + NOMA<br>Power · RB</th>
             <th>Power ↓</th>
             <th>PRB ↓</th>
           </tr>
@@ -852,33 +850,33 @@ workloads while still maintaining the SLA requirements of each slice.
         <tbody>
           <tr>
             <td>Scenario 1</td>
-            <td>158.3 W</td>
-            <td>109.7 W</td>
+            <td>158.3 W · 158.3</td>
+            <td>109.7 W · 151.3</td>
             <td class="pos">−30.7%</td>
             <td class="pos">−4.4%</td>
           </tr>
           <tr>
             <td>Scenario 2</td>
-            <td>≥ 100 W</td>
-            <td>73 W</td>
-            <td class="pos">−31%</td>
-            <td class="pos">lower</td>
+            <td>112.2 W · 112.2</td>
+            <td>74.7 W · 109.9</td>
+            <td class="pos">−33.4%</td>
+            <td class="pos">−2.0%</td>
           </tr>
           <tr>
             <td>Scenario 3</td>
-            <td>62.7 W</td>
-            <td>&lt; 50 W</td>
-            <td class="pos">−30%</td>
-            <td class="pos">lower</td>
+            <td>67.5 W · 67.5</td>
+            <td>47.5 W · 66.0</td>
+            <td class="pos">−29.6%</td>
+            <td class="pos">−2.2%</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p class="caption">Power figures compare the proposed 2D controller against the corresponding 1D KBRL baseline; the 2D family is the only one holding transmit power below 50 W in Scenario 3.</p>
+    <p class="caption">Mean transmit power (W) and mean PRB count per stage, comparing the proposed 2D KBRL + NOMA controller against the 1D KBRL baseline at δ = 0.99. The 2D family is the only one holding transmit power below 50 W in Scenario 3.</p>
 
     <h3>Key Findings</h3>
     <ul class="finding">
-      <li><strong>Power efficiency.</strong> Joint spectrum–power allocation cuts mean transmit power by roughly 30–32% with no SLA penalty, because a slice can meet its SLA with fewer PRBs at higher power or more PRBs at lower power — and the controller finds the cheaper mix.</li>
+      <li><strong>Power efficiency.</strong> Joint spectrum–power allocation cuts mean transmit power by roughly 30–32% while preserving the SLA-safety guarantees of the 1D framework, because a slice can meet its SLA with fewer PRBs at higher power or more PRBs at lower power — and the controller finds the cheaper mix.</li>
       <li><strong>Fewer overflow adjustments.</strong> The 2D controller lands inside the per-scenario budget more often, so the overflow projector trims less: 0.16 vs 0.24 (S1), 0.12 vs 0.17 (S2), 0.08 vs 0.09 (S3).</li>
       <li><strong>Higher classifier accuracy.</strong> The richer 2D action space lets the H-learner separate safe from unsafe allocations more reliably: 0.955 vs 0.943 (S1), 0.979 vs 0.967 (S2), 0.993 vs 0.986 (S3).</li>
       <li><strong>Cold-start safety preserved.</strong> The online-learning safety property that distinguishes KBRL from the deep-RL family survives the two-dimensional extension.</li>
