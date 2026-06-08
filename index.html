@@ -693,8 +693,23 @@
     </div>
     <div class="abstract-card">
       <p>
-       Network slicing enables multiple services to share a common 5G radio access network (RAN) while maintaining individual service level agreements (SLAs). However, most existing slice-level resource allocation approaches operate on a single resource dimension, typically physical resource blocks (PRBs), and assume fixed or uniform power distribution — an assumption that limits both spectral and energy efficiency as the number of coexisting slices and traffic variability increase. To address this limitation, this thesis proposes a two-level resource management framework that jointly considers spectrum and power allocation under coupled budget constraints. At the first level, we use a model-based reinforcement learning approach to extend the original one-dimensional allocation method into a two-dimensional action space. In this formulation, an online classifier is trained to capture how traffic conditions and resource decisions relate to SLA outcomes, allowing the agent to identify the minimum amount of PRBs and transmit power required for each slice. The second level focuses on scheduling users within each slice, where a NOMA-assisted reinforcement learning mechanism groups users that share the same resource blocks in order to push spectral and power efficiency further. We evaluate the proposed framework under multiple scenarios that differ in the number of active slices, the traffic profiles they carry, and the base station power budget. Our results show that performing joint spectrum and power allocation within a model-based RL setting is feasible, with the agent achieving positive SLA satisfaction across the tested configurations. At the same time, the experiments bring to light a number of challenges that are unique to the multi-resource case, notably the tendency of safety margins to grow over time and the greater difficulty of learning accurate decision boundaries in a higher-dimensional action space, both of which behave quite differently from what is observed in the single-resource baseline. These observations point toward promising directions for future work, including decomposing the action space hierarchically and exploring multi-agent architectures. Taken together, this thesis puts forward a multi-level allocation framework for 5G network slicing that aims to maintain SLA guarantees while making efficient use of both spectrum and power resources at the slice and user levels.
-      </p>
+       Radio access network (RAN) slicing requires the slice controller to continuously 
+partition resources such as physical resource blocks (PRBs) and transmit power 
+so that each slice meets its service-level agreement (SLA). A recent 
+kernel-based reinforcement-learning (KBRL) controller achieves cold-start 
+safety on this problem and outperforms standard deep-reinforcement-learning 
+baselines, but operates over a one-dimensional action space (PRBs only) and 
+assumes a physics-free mMTC channel. This thesis extends KBRL along two 
+axes, enlarged from PRB count to the joint (PRB count, per-PRB power) pair. 
+An intra-slice non-orthogonal multiple-access (NOMA) controller is added for 
+both eMBB and mMTC slices: UEs are paired by SINR gap and a deep 
+Q-network selects each pair's power-split coefficient under successive 
+interference cancellation. A 3GPP-compliant mMTC channel with QPSK 
+demodulation threshold and SIC failure cascade replaces the physics-free mMTC 
+layer of the original simulator. Across 30 seeds of three scenarios, the proposed 
+2D KBRL + NOMA controller reduces mean transmit power by 30–32 % and 
+PRB occupation by 4–5 % relative to the 1D KBRL baseline at identical 
+workloads while still maintaining the SLA requirements of each slice.
       
     </div>
   </div>
