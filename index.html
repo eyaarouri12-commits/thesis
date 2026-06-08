@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multi-Lev Resource Allocation for 5G Network Slicing</title>
+  <title>Multi-Level Resource Management in 5G Network Slicing — Eya Arouri, PNU</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -413,6 +413,88 @@
       top: 0.15rem;
     }
 
+    /* ── RESULTS TABLE ── */
+    .table-wrap { overflow-x: auto; margin: 1.8rem 0; }
+    table.results {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      min-width: 480px;
+    }
+    table.results th, table.results td {
+      padding: 0.7rem 0.9rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    table.results thead th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      border-bottom: 1px solid var(--gold-dim);
+    }
+    table.results td { color: #b8b0a4; }
+    table.results tbody tr:hover { background: rgba(201,168,76,0.04); }
+    table.results td.pos { color: #86ef9c; font-weight: 400; }
+    table.results .row-prop td { color: var(--text); }
+    table.results .row-prop td:first-child { color: var(--gold); }
+
+    .caption {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: -0.6rem;
+      margin-bottom: 1.5rem;
+    }
+
+    ul.finding {
+      list-style: none;
+      margin: 1.5rem 0;
+      padding: 0;
+    }
+    ul.finding li {
+      position: relative;
+      padding-left: 1.6rem;
+      margin-bottom: 0.9rem;
+      font-size: 0.93rem;
+      color: #b8b0a4;
+      line-height: 1.7;
+    }
+    ul.finding li::before {
+      content: '';
+      position: absolute; left: 0; top: 0.6rem;
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 1px;
+      transform: rotate(45deg);
+    }
+    ul.finding li strong { color: var(--text); font-weight: 500; }
+
+    /* ── COMMITTEE ── */
+    .committee {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+    }
+    .committee-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.1rem 1.2rem;
+    }
+    .committee-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+    .committee-name { font-size: 0.95rem; color: var(--text); }
+
     /* ── LINKS ── */
     .link-row {
       display: flex; flex-direction: column; gap: 0.75rem;
@@ -553,6 +635,7 @@
     <li><a href="#methodology">Methodology</a></li>
     <li><a href="#results">Results</a></li>
     <li><a href="#references">References</a></li>
+    <li><a href="#files">Thesis</a></li>
   </ul>
 </nav>
 
@@ -565,16 +648,16 @@
   </div>
 
   <h1>
-    Multi-Level Resource Allocation for <em>5G Network Slicing</em>:<br/>
-    Spectrum, Power &amp; NOMA<br/>
+    Multi-Level Resource Management in <em>5G Network Slicing</em>:<br/>
+    Spectrum, Power and NOMA
   </h1>
 
   <div class="hero-meta">
     <strong>Eya Arouri</strong>
     <span class="divider">|</span>
-    <span>Advisor: Prof. Yoo Young Hwan</span>
+    <span>Advisor: Prof. Yoo Younghwan</span>
     <span class="divider">|</span>
-    <span>Department of Computer Science and Engineering</span>
+    <span>Department of Information Convergence Engineering</span>
   </div>
 
   <div class="hero-cta">
@@ -618,7 +701,7 @@
 
   <hr class="section-divider" />
 
-  <!-- MOTIVATION -->
+  <!-- METHODOLOGY -->
   <div class="section" id="methodology">
     <div class="section-label">
       <span class="num">02</span>
@@ -626,12 +709,81 @@
       <h2>Methodology</h2>
     </div>
 
-  
+    <p>
+      The framework decomposes radio-resource management into two control loops running at
+      different timescales and couples them through a single binary SLA signal. A slow
+      <mark>inter-slice</mark> controller decides, once every <code>T_step</code> TTIs, how many PRBs and how much
+      transmit power each slice receives. A fast <mark>intra-slice</mark> controller then decides, every TTI,
+      how each slice uses that budget to serve its own users. The two levels exchange only the
+      allocation (downward) and the next observation plus the SLA outcome (upward), which lets each
+      level be designed and analysed independently.
+    </p>
+
+    <div class="arch-diagram">
+      <div class="arch-level l1">
+        <span class="arch-level-num">LEVEL 1</span>
+        <div>
+          <div class="arch-level-text">Inter-Slice Controller — Two-Dimensional KBRL</div>
+          <div class="arch-level-sub">Allocates the joint pair (PRBs, power-per-RB) to each slice · runs every T_step TTIs</div>
+        </div>
+      </div>
+      <div class="arch-arrow">↓ &nbsp; allocation (rᵢ, pᵢ)</div>
+      <div class="arch-level l2">
+        <span class="arch-level-num">LEVEL 2</span>
+        <div>
+          <div class="arch-level-text">Intra-Slice Controller — NOMA Pairing + DQN Power Split</div>
+          <div class="arch-level-sub">Pairs UEs by SNR gap, a DQN selects each pair's power-split α, SIC at the receiver · runs every TTI</div>
+        </div>
+      </div>
+      <div class="arch-arrow">↑ &nbsp; aggregate KPIs → SLA indicator</div>
+      <div class="arch-level l3">
+        <span class="arch-level-num">FEEDBACK</span>
+        <div>
+          <div class="arch-level-text">SLA Evaluation &amp; Online Learning</div>
+          <div class="arch-level-sub">Boolean SLA outcome updates the per-slice kernel classifiers — no offline pre-training</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Level 1 — Two-Dimensional KBRL</h3>
+    <p>
+      The original kernel-based reinforcement-learning controller acts on a one-dimensional action
+      (PRB count only). This work extends the action to the joint pair <code>(r, p)</code> — the number of
+      PRBs and the power assigned to each PRB — drawn from a finite power grid. Rather than learning
+      the full system dynamics, each slice trains an online <mark>Projectron</mark> classifier that predicts whether a
+      candidate allocation will satisfy that slice's SLA, and the controller selects the cheapest
+      allocation predicted safe. Three modules run per decision stage: an <strong>H-learner</strong> that updates the
+      classifiers using <em>L-shape augmentation</em> to preserve monotonicity across <em>both</em> resource axes, an
+      <strong>E-learner</strong> that tracks per-axis classifier reliability through a security margin, and a
+      <strong>controller</strong> that performs a decoupled two-phase search — minimising PRBs first, then trimming
+      power-per-RB at that PRB count.
+    </p>
+
+    <h3>Level 2 — Learned NOMA Scheduling</h3>
+    <p>
+      Inside each slice, users are paired by an SNR-gap heuristic (strongest-with-weakest), and a deep
+      Q-network selects each pair's power-splitting coefficient α, allocating at least half the per-PRB
+      power to the weaker user so that successive interference cancellation (SIC) at the stronger user is
+      well-posed. SIC failure is modelled explicitly — via a Bernoulli draw on a link-level reception
+      curve for eMBB, and a hard QPSK demodulation threshold for mMTC. Users that cannot be paired fall
+      back to a proportional-fair OMA scheduler. The DQN learns online from per-TTI rewards and requires
+      no offline pre-training.
+    </p>
+
+    <h3>3GPP-Compliant mMTC Channel Model</h3>
+    <p>
+      The original simulator advanced mMTC repetition counters deterministically with no SINR check.
+      This work replaces that physics-free layer with a per-sensor SNR model built on 3GPP TS 36.942
+      outdoor path loss, indoor-penetration offsets repurposed from the NB-IoT coverage classes of
+      3GPP TR 45.820, and a QPSK demodulation threshold. Failed decoding now keeps sensors in the queue
+      across retry slots, so transmission failures and retransmissions genuinely affect resource
+      decisions — making the inter-slice power axis actionable at the link level.
+    </p>
   </div>
 
   <hr class="section-divider" />
 
-  <!-- METHODS -->
+  <!-- RESULTS -->
   <div class="section" id="results">
     <div class="section-label">
       <span class="num">03</span>
@@ -639,12 +791,89 @@
       <h2>Performance &amp; Results</h2>
     </div>
 
-    
+    <p>
+      The proposed 2D KBRL + NOMA controller was evaluated against the 1D KBRL baseline and seven
+      deep-RL baselines (NAF, PPO1, PPO2, TRPO, A2C, TD3, SAC) on the same simulator, scenarios, and
+      SLA bounds. Each algorithm was run for <strong>30 independent seeds</strong> across <strong>three scenarios</strong>, with a
+      learning phase of 40,000 decision stages from a cold start.
+    </p>
+
+    <div class="metrics">
+      <div class="metric">
+        <span class="metric-value">30–32%</span>
+        <span class="metric-label">Lower transmit power</span>
+      </div>
+      <div class="metric">
+        <span class="metric-value">4–5%</span>
+        <span class="metric-label">Lower PRB usage</span>
+      </div>
+      <div class="metric">
+        <span class="metric-value">0.99</span>
+        <span class="metric-label">Classifier accuracy (S3)</span>
+      </div>
+      <div class="metric">
+        <span class="metric-value">3 × 30</span>
+        <span class="metric-label">Scenarios × seeds</span>
+      </div>
+    </div>
+
+    <p>
+      Across all three scenarios the joint (PRB, power) controller meets the same SLA targets as the
+      1D baseline while using substantially less transmit power and slightly fewer PRBs at identical
+      workloads:
+    </p>
+
+    <div class="table-wrap">
+      <table class="results">
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>1D KBRL — Power</th>
+            <th>2D + NOMA — Power</th>
+            <th>Power ↓</th>
+            <th>PRB ↓</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Scenario 1</td>
+            <td>158.3 W</td>
+            <td>109.7 W</td>
+            <td class="pos">−30.7%</td>
+            <td class="pos">−4.4%</td>
+          </tr>
+          <tr>
+            <td>Scenario 2</td>
+            <td>≥ 100 W</td>
+            <td>73 W</td>
+            <td class="pos">−31%</td>
+            <td class="pos">lower</td>
+          </tr>
+          <tr>
+            <td>Scenario 3</td>
+            <td>62.7 W</td>
+            <td>&lt; 50 W</td>
+            <td class="pos">−30%</td>
+            <td class="pos">lower</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Power figures compare the proposed 2D controller against the corresponding 1D KBRL baseline; the 2D family is the only one holding transmit power below 50 W in Scenario 3.</p>
+
+    <h3>Key Findings</h3>
+    <ul class="finding">
+      <li><strong>Power efficiency.</strong> Joint spectrum–power allocation cuts mean transmit power by roughly 30–32% with no SLA penalty, because a slice can meet its SLA with fewer PRBs at higher power or more PRBs at lower power — and the controller finds the cheaper mix.</li>
+      <li><strong>Fewer overflow adjustments.</strong> The 2D controller lands inside the per-scenario budget more often, so the overflow projector trims less: 0.16 vs 0.24 (S1), 0.12 vs 0.17 (S2), 0.08 vs 0.09 (S3).</li>
+      <li><strong>Higher classifier accuracy.</strong> The richer 2D action space lets the H-learner separate safe from unsafe allocations more reliably: 0.955 vs 0.943 (S1), 0.979 vs 0.967 (S2), 0.993 vs 0.986 (S3).</li>
+      <li><strong>Cold-start safety preserved.</strong> The online-learning safety property that distinguishes KBRL from the deep-RL family survives the two-dimensional extension.</li>
+      <li><strong>An honest trade-off.</strong> The 3GPP-compliant mMTC layer counts decoding failures and retransmissions that the 1D simulator never modelled, so reducing per-RB power can push some sensors near the decoding threshold. The resulting raw-violation increase reflects the price of physical realism, not a control regression — and it makes the energy-efficiency-versus-reliability trade-off observable for the first time.</li>
+    </ul>
   </div>
 
   <hr class="section-divider" />
 
-  <!-- RESULTS -->
+  <!-- REFERENCES -->
   <div class="section" id="references">
     <div class="section-label">
       <span class="num">04</span>
@@ -652,8 +881,84 @@
       <h2>References</h2>
     </div>
 
-   
+    <ol class="refs">
+      <li>J. J. Alcaraz, F. Losilla, A. Zanella, and M. Zorzi. Model-based reinforcement learning with kernels for resource allocation in RAN slices. <em>IEEE Transactions on Wireless Communications</em>, 22(1):486–501, Jan. 2023.</li>
+      <li>3GPP. System architecture for the 5G System (5GS); Stage 2. TS 23.501, v17.5.0, June 2022.</li>
+      <li>NGMN Alliance. NGMN 5G white paper. Technical report, Feb. 2015.</li>
+      <li>X. Foukas, G. Patounas, A. Elmokashfi, and M. K. Marina. Network slicing in 5G: Survey and challenges. <em>IEEE Communications Magazine</em>, 55(5):94–100, May 2017.</li>
+      <li>I. Afolabi, T. Taleb, K. Samdanis, A. Ksentini, and H. Flinck. Network slicing and softwarization: A survey on principles, enabling technologies, and solutions. <em>IEEE Communications Surveys &amp; Tutorials</em>, 20(3):2429–2453, 2018.</li>
+      <li>L. U. Khan, I. Yaqoob, N. H. Tran, Z. Han, and C. S. Hong. Network slicing: Recent advances, taxonomy, requirements, and open research challenges. <em>IEEE Access</em>, 8:36009–36028, 2020.</li>
+      <li>H. Zhang and V. W. S. Wong. A two-timescale approach for network slicing in C-RAN. <em>IEEE Transactions on Vehicular Technology</em>, 69(6):6656–6669, June 2020.</li>
+      <li>H. Zhou, M. Elsayed, and M. Erol-Kantarci. RAN resource slicing in 5G using multi-agent correlated Q-learning. In <em>IEEE PIMRC</em>, pp. 1179–1184, Sept. 2021.</li>
+      <li>R. S. Sutton and A. G. Barto. <em>Reinforcement Learning: An Introduction</em>. MIT Press, 2nd ed., 2018.</li>
+      <li>V. Mnih, K. Kavukcuoglu, D. Silver, et al. Human-level control through deep reinforcement learning. <em>Nature</em>, 518(7540):529–533, 2015.</li>
+      <li>H. van Hasselt, A. Guez, and D. Silver. Deep reinforcement learning with double Q-learning. In <em>AAAI</em>, pp. 2094–2100, 2016.</li>
+      <li>J. Schulman, S. Levine, P. Moritz, M. I. Jordan, and P. Abbeel. Trust region policy optimization. In <em>ICML</em>, vol. 37, pp. 1889–1897, 2015.</li>
+      <li>J. Schulman, F. Wolski, P. Dhariwal, A. Radford, and O. Klimov. Proximal policy optimization algorithms. arXiv:1707.06347, 2017.</li>
+      <li>V. Mnih, A. P. Badia, M. Mirza, et al. Asynchronous methods for deep reinforcement learning. In <em>ICML</em>, vol. 48, pp. 1928–1937, 2016.</li>
+      <li>T. P. Lillicrap, J. J. Hunt, A. Pritzel, et al. Continuous control with deep reinforcement learning. In <em>ICLR</em>, 2016.</li>
+      <li>S. Fujimoto, H. van Hoof, and D. Meger. Addressing function approximation error in actor-critic methods. In <em>ICML</em>, vol. 80, pp. 1582–1591, 2018.</li>
+      <li>T. Haarnoja, A. Zhou, P. Abbeel, and S. Levine. Soft actor-critic: Off-policy maximum entropy deep RL with a stochastic actor. In <em>ICML</em>, vol. 80, pp. 1861–1870, 2018.</li>
+      <li>S. Gu, T. Lillicrap, I. Sutskever, and S. Levine. Continuous deep Q-learning with model-based acceleration. In <em>ICML</em>, vol. 48, pp. 2829–2838, 2016.</li>
+      <li>F. Orabona, J. Keshet, and B. Caputo. Bounded kernel-based online learning. <em>Journal of Machine Learning Research</em>, 10:2643–2666, 2009.</li>
+      <li>Y. Saito, Y. Kishiyama, A. Benjebbour, T. Nakamura, A. Li, and K. Higuchi. Non-orthogonal multiple access (NOMA) for cellular future radio access. In <em>IEEE VTC Spring</em>, pp. 1–5, 2013.</li>
+      <li>Z. Ding, Y. Liu, J. Choi, et al. Application of non-orthogonal multiple access in LTE and 5G networks. <em>IEEE Communications Magazine</em>, 55(2):185–191, 2017.</li>
+      <li>T. M. Cover. Broadcasting. <em>IEEE Transactions on Information Theory</em>, 18(1):2–14, 1972.</li>
+      <li>C. He, Y. Hu, Y. Chen, and B. Zeng. Joint power allocation and channel assignment for NOMA with deep reinforcement learning. <em>IEEE JSAC</em>, 37(10):2200–2210, 2019.</li>
+      <li>A. Rabee and I. Barhumi. Toward energy-efficient dynamic resource allocation in uplink NOMA systems: Deep RL for single and multi-cell NOMA. <em>IEEE Transactions on Vehicular Technology</em>, 74(6):9313–9327, 2025.</li>
+      <li>A. Amer, S. Hoteit, and J. Ben Othman. Resource allocation for enabled-network-slicing in cooperative NOMA-based systems with underlay D2D communications. In <em>IEEE ICC</em>, pp. 1344–1349, 2023.</li>
+      <li>R. S. Sutton, D. Precup, and S. Singh. Between MDPs and semi-MDPs: A framework for temporal abstraction in reinforcement learning. <em>Artificial Intelligence</em>, 112(1-2):181–211, 1999.</li>
+      <li>A. G. Barto and S. Mahadevan. Recent advances in hierarchical reinforcement learning. <em>Discrete Event Dynamic Systems</em>, 13(1-2):41–77, 2003.</li>
+      <li>P.-L. Bacon, J. Harb, and D. Precup. The option-critic architecture. In <em>AAAI</em>, pp. 1726–1734, 2017.</li>
+      <li>A. S. Vezhnevets, S. Osindero, T. Schaul, et al. FeUdal networks for hierarchical reinforcement learning. In <em>ICML</em>, vol. 70, pp. 3540–3549, 2017.</li>
+      <li>S. T. Muntaha, M. Hafeez, Q. Z. Ahmed, F. A. Khan, Z. D. Zaharis, and P. I. Lazaridis. RAN slicing with joint resource allocation for a multi-tenant–multi-service system. <em>IEEE Transactions on Cognitive Communications and Networking</em>, 11(3):1927–1939, 2025.</li>
+      <li>D.-D. Tran, V. N. Ha, S. K. Sharma, T. T. Nguyen, S. Chatzinotas, and P. Popovski. Energy-efficient NOMA for 5G heterogeneous services: A joint optimization and deep RL approach. <em>IEEE Transactions on Communications</em>, 73(4):2448–2465, 2025.</li>
+      <li>F. Ye, J. Li, P. Zhu, D. Wang, and X. You. Intelligent hierarchical NOMA-based network slicing in cell-free RAN for 6G systems. <em>IEEE Transactions on Wireless Communications</em>, 23(5):4724–4737, 2024.</li>
+      <li>3GPP. E-UTRA; Radio Frequency (RF) System Scenarios. TS 36.942, v15.0.0, 2018.</li>
+      <li>3GPP. E-UTRA; Base Station (BS) Radio Transmission and Reception. TS 36.104, v15.15.0, 2022.</li>
+      <li>S. Bhatia, A. Mehlführer, A. Asadi, et al. A systematic analysis of Narrowband IoT quality of service. <em>Sensors</em>, 20(6):1636, 2020.</li>
+      <li>3GPP. Cellular system support for ultra-low complexity and low throughput Internet of Things (CIoT). TR 45.820, v13.1.0, 2015.</li>
+      <li>A. Raffin, A. Hill, A. Gleave, A. Kanervisto, M. Ernestus, and N. Dormann. Stable-Baselines3: Reliable reinforcement learning implementations. <em>Journal of Machine Learning Research</em>, 22(268):1–8, 2021.</li>
+    </ol>
   </div>
+
+  <hr class="section-divider" />
+
+  <!-- FILES / SUBMISSION -->
+  <div class="section" id="files">
+    <div class="section-label">
+      <span class="num">05</span>
+      <span class="line"></span>
+      <h2>Thesis &amp; Committee</h2>
+    </div>
+
+    <p>
+      Master of Science · Department of Information Convergence Engineering · Pusan National University ·
+      Graduated August 2026.
+    </p>
+
+    <div class="committee">
+      <div class="committee-card">
+        <div class="committee-role">Committee Chair</div>
+        <div class="committee-name">Kim Jongdeok</div>
+      </div>
+      <div class="committee-card">
+        <div class="committee-role">Committee Member</div>
+        <div class="committee-name">Kim Wonseok</div>
+      </div>
+      <div class="committee-card">
+        <div class="committee-role">Member · Advisor</div>
+        <div class="committee-name">Yoo Younghwan</div>
+      </div>
+    </div>
+
+    <div class="file-grid">
+      <a class="file-card" href="thesis.pdf" target="_blank" rel="noopener">
+        <span class="file-card-icon">📄</span>
+        <span class="file-card-name">Full Thesis</span>
+        <span class="file-card-type">PDF</span>
+      </a>
+    </div>
   </div>
 
 </main>
@@ -661,7 +966,7 @@
 <!-- FOOTER -->
 <footer>
   <p>© 2026 <strong>Eya Arouri</strong> · <span class="pnu">Pusan National University</span></p>
-  <p>Department of Computer Science and Engineering · Master's Thesis</p>
+  <p>Department of Information Convergence Engineering · Master of Science · August 2026</p>
 </footer>
 
 <script>
