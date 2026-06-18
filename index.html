@@ -632,6 +632,7 @@
   <a class="nav-logo" href="#top">PNU · Master's Thesis</a>
   <ul class="nav-links">
     <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#motivation">Motivation</a></li>
     <li><a href="#methodology">Methodology</a></li>
     <li><a href="#results">Results</a></li>
     <li><a href="#references">References</a></li>
@@ -712,6 +713,55 @@ PRB occupation by 4–5 % relative to the 1D KBRL baseline at identical
 workloads while still maintaining the SLA requirements of each slice.
       
     </div>
+  </div>
+  <hr class="section-divider" />
+
+  <!-- MOTIVATION -->
+  <div class="section" id="motivation">
+    <div class="section-label">
+      <span class="num">02</span>
+      <span class="line"></span>
+      <h2>Motivation &amp; Problem</h2>
+    </div>
+
+    <p>
+      In 5G, a single base station must serve very different services on the same
+      time–frequency grid: <mark>eMBB</mark> for high-rate streaming, <mark>mMTC</mark> for vast populations of
+      low-rate sensors, and URLLC for sub-millisecond control traffic. Each runs as a
+      <em>network slice</em> with its own service-level agreement (SLA), and the operator must decide, at
+      every instant, how to split the limited PRBs and transmit-power budget across slices so that
+      every SLA is met without wasting resources. A fixed split cannot work: traffic rises and falls
+      on daily and event-driven cycles, so a partition sized for the peak wastes capacity off-peak,
+      while one sized for the average breaks SLAs at the peak.
+    </p>
+
+    <p>
+      Dynamic partitioning is therefore essential — but hard. The system is only partially observed,
+      its dynamics are stochastic, and the SLA result arrives only at the end of each decision period
+      as a single delayed yes/no signal. These properties make reinforcement learning (RL) a natural
+      fit, yet standard deep-RL controllers carry a fatal drawback for a <em>live</em> network: they need
+      enormous amounts of trial-and-error to converge, and every exploratory mistake is a real,
+      operator-visible SLA violation. None offers a deployable <strong>cold-start</strong> safety profile.
+    </p>
+
+    <p>
+      The kernel-based RL (KBRL) controller this work builds on solves the cold-start problem: instead
+      of learning the full system dynamics, it learns a per-slice classifier for SLA satisfaction and
+      picks the smallest allocation predicted safe. But its published form has two limits that this
+      thesis targets directly:
+    </p>
+
+    <ul class="finding">
+      <li><strong>Power left on the table.</strong> Its action is one-dimensional — PRB count only — so per-PRB transmit power is held fixed and the entire power domain sits outside the controller, even though a slice can often meet its SLA more cheaply by trading bandwidth against power.</li>
+      <li><strong>A physics-free mMTC layer.</strong> Its simulator advances sensor repetition counters with no SINR check or demodulation threshold, so a sensor that should fail to decode is always counted as served — making any evaluation of power control under realistic mMTC links impossible.</li>
+    </ul>
+
+    <p>
+      This raises the central question of the thesis: <em>can the cold-start safety of KBRL be preserved
+      while extending the inter-slice action to jointly control PRBs and per-PRB power, and adding a
+      learned intra-slice NOMA controller under a 3GPP-compliant mMTC channel?</em> The methodology below
+      answers it.
+    </p>
   </div>
 
   <hr class="section-divider" />
