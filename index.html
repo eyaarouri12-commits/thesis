@@ -796,7 +796,7 @@ workloads while still maintaining the SLA requirements of each slice.
     </p>
   </div>
 
-  <hr class="section-divider" />
+<hr class="section-divider" />
 
   <!-- RESULTS -->
   <div class="section" id="results">
@@ -823,8 +823,8 @@ workloads while still maintaining the SLA requirements of each slice.
         <span class="metric-label">Lower PRB usage</span>
       </div>
       <div class="metric">
-        <span class="metric-value">0.99</span>
-        <span class="metric-label">Classifier accuracy (S3)</span>
+        <span class="metric-value">≈7×</span>
+        <span class="metric-label">Fewer mMTC repetitions used vs assigned</span>
       </div>
       <div class="metric">
         <span class="metric-value">3 × 30</span>
@@ -879,6 +879,8 @@ workloads while still maintaining the SLA requirements of each slice.
       <li><strong>Power efficiency.</strong> Joint spectrum–power allocation cuts mean transmit power by roughly 30–32% while preserving the SLA-safety guarantees of the 1D framework, because a slice can meet its SLA with fewer PRBs at higher power or more PRBs at lower power — and the controller finds the cheaper mix.</li>
       <li><strong>Fewer overflow adjustments.</strong> The 2D controller lands inside the per-scenario budget more often, so the overflow projector trims less: 0.16 vs 0.24 (S1), 0.12 vs 0.17 (S2), 0.08 vs 0.09 (S3).</li>
       <li><strong>Higher classifier accuracy.</strong> The richer 2D action space lets the H-learner separate safe from unsafe allocations more reliably: 0.955 vs 0.943 (S1), 0.979 vs 0.967 (S2), 0.993 vs 0.986 (S3).</li>
+      <li><strong>Repetition efficiency.</strong> Because a successful decode ends a sensor's repetition sequence, the controller uses far fewer repetitions than it assigns — a mean of ≈ 5 used vs ≈ 36 assigned in Scenario 2 and ≈ 5–6 vs ≈ 37 in Scenario 3. The 1D simulator decrements the counter unconditionally and cannot reveal this saving.</li>
+      <li><strong>Outperforms the deep-RL family.</strong> Every deep-RL baseline (NAF, PPO1/2, TRPO, A2C, TD3, SAC) uses more transmit power and incurs more violations across all three scenarios; the proposed controller sits alone at the low-power, low-violation corner.</li>
       <li><strong>Cold-start safety preserved.</strong> The online-learning safety property that distinguishes KBRL from the deep-RL family survives the two-dimensional extension.</li>
       <li><strong>An honest trade-off.</strong> The 3GPP-compliant mMTC layer counts decoding failures and retransmissions that the 1D simulator never modelled, so reducing per-RB power can push some sensors near the decoding threshold. The resulting raw-violation increase reflects the price of physical realism, not a control regression — and it makes the energy-efficiency-versus-reliability trade-off observable for the first time.</li>
     </ul>
