@@ -623,6 +623,24 @@
       padding: 0.1em 0.35em;
       border-radius: 2px;
     }
+    .method-figure {
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .method-figure img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--surface);
+      padding: 1rem;
+    }
+    .method-figure figcaption {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 0.8rem;
+    }
   </style>
 </head>
 <body>
@@ -834,6 +852,10 @@ workloads while still maintaining the SLA requirements of each slice.
       back to a proportional-fair OMA scheduler. The DQN learns online from per-TTI rewards and requires
       no offline pre-training.
     </p>
+    <figure class="method-figure">
+      <img src="system.png" alt="Overall system architecture: two-level inter-slice and intra-slice control loops" />
+      <figcaption>Overall system architecture — the two-level controller: a 2D KBRL inter-slice loop allocating (PRBs, power) and a NOMA + DQN intra-slice loop, coupled through the SLA indicator.</figcaption>
+    </figure>
 
     <h3>3GPP-Compliant mMTC Channel Model</h3>
     <p>
